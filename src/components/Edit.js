@@ -3,38 +3,27 @@ import {Button,Form} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dogs from "./Dogs";
 import {v4 as uuid} from "uuid";
-import{Link,useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
+import {useDog, useDogs} from "../api/dogsHandler";
 
-function Edit(){
-    const[name,setName] = useState('');
-    const[age,setAge] = useState(0);
-    const[id,setId] = useState('');
-    const[breed,setBreed] = useState('');
-
+function Edit(props){
+    const {state} = useLocation();
+    const[name,setName] = useState(state.name);
+    const[age,setAge] = useState(state.age);
+    const[id,setId] = useState(state.id);
+    const[breed,setBreed] = useState(state.breed);
+    const [dog] = useDog(state?.id);
     let history = useNavigate();
+    console.log(state);
 
-    var index = Dogs.map(function(e){
-        return e.id
-    }).indexOf(id);
 
     const handleUpdate=(e)=>{
         e.preventDefault();
 
-        let a = Dogs[index];
-        a.Name=name;
-        a.Age=age;
-        a.Breed=breed;
-
+        console.log("update")
         history("/")
     }
 
-    useEffect(()=>{
-        setName(localStorage.getItem('Name'))
-        setAge(localStorage.getItem('Age'))
-        setBreed(localStorage.getItem('Breed'))
-        setId(localStorage.getItem('Id'))
-
-    },[])
 
     return(
         <div>

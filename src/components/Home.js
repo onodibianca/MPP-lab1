@@ -1,33 +1,43 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Button,Table} from 'react-bootstrap';
+import {Button, Table} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dogs from "./Dogs";
 import {} from 'react-router-dom';
-import{Link,useNavigate} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import InputGroup from 'react-bootstrap/InputGroup';
+import {useDogs} from "../api/dogsHandler";
 
-function Home(){
+function Home() {
 
     let history = useNavigate();
     const [selectedDogs, setSelectedDogs] = useState([]);
-    const [myDogs, setMyDogs] = useState(Dogs);
+    const [myDogs] = useDogs();
+    const [myBeData, setMyBeData] = useState('');
+    let navigate = useNavigate();
+    const handleEdit = (id, name, age, breed) => {
+        navigate(`/edit`, {state: {id, name, age, breed}});
+    };
+
+    // const handleViewDetails = (id, name, age, breed) => {
+    //     navigate(`/get`, {state: {id, name, age, breed}});
+    // };
     const handleDelete = (id) => {
-        var index = Dogs.map(function(e){
-            return e.id
-        }).indexOf(id);
-
-        Dogs.splice(index,1);
-
-        setMyDogs([...Dogs]);
+        // var index = Dogs.map(function (e) {
+        //     return e.id
+        // }).indexOf(id);
+        //
+        // Dogs.splice(index, 1);
+        //
+        // setMyDogs([...Dogs]);
         // history('/');
     }
 
-    const handleEdit=(id,name,age,breed)=>{
-        localStorage.setItem('Name',name);
-        localStorage.setItem('Age',age);
-        localStorage.setItem('Breed',breed);
-        localStorage.setItem('Id',id);
-    }
+    // const handleEdit = (id, name, age, breed) => {
+    //     localStorage.setItem('Name', name);
+    //     localStorage.setItem('Age', age);
+    //     localStorage.setItem('Breed', breed);
+    //     localStorage.setItem('Id', id);
+    // }
 
 
     const handleViewDetails = (id, name, age, breed) => {
@@ -36,11 +46,20 @@ function Home(){
         localStorage.setItem('Breed', breed);
         localStorage.setItem('Id', id);
     }
-    useEffect(() => {
-        console.log(myDogs)
-    }, [myDogs])
+    // useEffect(() => {
+    //     const testBE = async () => {
+    //         const response = await fetch('http://localhost:4000/dogs').catch((e) => {
+    //             console.log('request failed', e);
+    //         });
+    //         if (!response) return
+    //         const myData = await response.json()
+    //        setMyDogs(myData);
+    //     }
+    //
+    //     testBE();
+    // }, [])
 
-    const handleSelection = (id)=>{
+    const handleSelection = (id) => {
         if (!selectedDogs.includes(id)) {
             setSelectedDogs([...selectedDogs, id])
         } else {
@@ -54,47 +73,50 @@ function Home(){
         Dogs.splice(index, 1);
     }
 
-    function handleBulkDelete () {
-        for (let i = 0; i < Dogs.length ; i++) {
-           if (selectedDogs.includes(Dogs[i].id)) {
-               myDelete(Dogs[i].id, Dogs);
-               i--;
-           }
-        }
-        setMyDogs([...Dogs])
+    function handleBulkDelete() {
+        // for (let i = 0; i < Dogs.length; i++) {
+        //     if (selectedDogs.includes(Dogs[i].id)) {
+        //         myDelete(Dogs[i].id, Dogs);
+        //         i--;
+        //     }
+        // }
+        // setMyDogs([...Dogs])
     }
 
-    return(
+    return (
         <Fragment>
-            <div style={{margin:"10rem"}}>
+            <div style={{margin: "10rem"}}>
+                {myBeData ? <div> Connected to the BE: {myBeData} </div> :
+                    <div>Loading...</div>}
                 <Table striped bordered hover size="sm">
                     <thead>
-                        <tr>
-                            <th>
-                                Select
-                            </th>
-                            <th>
-                                Name
-                            </th>
-                            <th>
-                                Age
-                            </th>
-                            <th>
-                                Breed
-                            </th>
-                            <th>
-                                Actions
-                            </th>
-                        </tr>
+                    <tr>
+                        <th>
+                            Select
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Age
+                        </th>
+                        <th>
+                            Breed
+                        </th>
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
                     </thead>
                     <tbody>
                     {myDogs && myDogs.length > 0
-                    ?
-                        myDogs.map((item)=>{
-                            return(
+                        ?
+                        myDogs.map((item) => {
+                            return (
                                 <tr key={item.id}>
                                     <td><InputGroup className="mb-3">
-                                        <InputGroup.Checkbox onClick={()=>handleSelection(item.id)} aria-label="Checkbox for following text input" />
+                                        <InputGroup.Checkbox onClick={() => handleSelection(item.id)}
+                                                             aria-label="Checkbox for following text input"/>
                                     </InputGroup>
                                     </td>
                                     <td>
@@ -107,18 +129,12 @@ function Home(){
                                         {item.Breed}
                                     </td>
                                     <td>
-                                        <Button onClick={()=>handleDelete(item.id)}> DELETE</Button>
-                                        &nbsp;
-                                        <Link to={'/edit'}>
-                                        <Button onClick={() => handleEdit(item.id,item.Name,item.Age,item.Breed)}> EDIT</Button>
-                                        </Link>
-                                        &nbsp;
-                                        <Link to={'/details'}>
-                                            <Button onClick={() => handleViewDetails(item.id, item.Name, item.Age, item.Breed)}>VIEW DETAILS</Button>
-                                        </Link>
-
+                                        <Button onClick={() => handleDelete(item.id)}> DELETE</Button>
+                                        <Button onClick={() => handleEdit(item.id, item.Name, item.Age, item.Breed)}> EDIT</Button>
+                                        <Button onClick={() => handleViewDetails(item.id, item.Name, item.Age, item.Breed)}>VIEW DETAILS</Button>
                                     </td>
-                                </tr>)
+                                </tr>
+                            )
                         })
                         :
                         <tr>
@@ -140,4 +156,5 @@ function Home(){
 
     )
 }
+
 export default Home;
